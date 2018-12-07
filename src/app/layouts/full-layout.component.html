@@ -1,0 +1,58 @@
+<header class="app-header navbar">
+    <button class="navbar-toggler d-lg-none" type="button" appMobileSidebarToggler>&#9776;</button>
+    <a class="navbar-brand" href="#"></a>
+
+    <!--<div class="collapse navbar-collapse" id="navbarSupportedContent">-->
+        <ul class="navbar-nav ml-auto">
+            <li class="nav-item" *ngIf="!_userService.isLoggedIn()">
+                <a class="nav-link" routerLink="/auth/login">Login</a>
+            </li>
+            <li class="nav-item" *ngIf="!_userService.isLoggedIn()">
+                <a class="nav-link" routerLink="/auth/register">Register</a>
+            </li>
+            <li class="nav-item" *ngIf="_userService.isLoggedIn()">
+                <a class="nav-link" routerLink="/dashboard">Dashboard</a>
+            </li>
+            <li class="nav-item" *ngIf="_userService.isLoggedIn()">
+                <a class="nav-link" routerLink="/auth/logout">Log Out</a>
+            </li>
+            <li class="nav-item dropdown" dropdown (onToggle)="toggled($event)"  *ngIf="_userService.isLoggedIn()">
+                <a href class="nav-link dropdown-toggle" dropdownToggle (click)="false">
+                    <span class="d-md-down-none">{{userData.username | capitalize}}</span>
+                </a>
+                <div class="dropdown-menu dropdown-menu-right" *dropdownMenu aria-labelledby="simple-dropdown">
+                    <a class="dropdown-item" routerLinkActive="active" [routerLink]="['/logout']"><i class="fa fa-lock"></i> Logout</a>
+                </div>
+            </li>
+        </ul>
+    <!--</div>-->
+</header>
+
+
+<div class="app-body">
+    <div class="sidebar">
+        <nav class="sidebar-nav">
+            <ul class="nav">
+                <li class="divider"></li>
+
+                <li class="nav-item">
+                    <a class="nav-link" routerLinkActive="active" [routerLink]="['/logout']"><i class="icon-lock"></i> Logout</a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+
+    <!-- Main content -->
+    <main class="main">
+        <div class="container-fluid">
+            <router-outlet></router-outlet>
+        </div>
+        <!-- /.conainer-fluid -->
+    </main>
+
+</div>
+
+<footer class="app-footer">
+     &copy; 2017 <a href=""></a>
+    <span class="float-right">Powered by <a href="http://notionsoft.io">NotionSoft</a>.</span>
+</footer>
