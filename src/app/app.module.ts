@@ -28,6 +28,10 @@ import {AuthGuard} from './models/auth.guard';
 import {UserService} from './models/user.service';
 import {GlobalService} from './models/global.service';
 import {DataService} from './models/data.service';
+import { SharedModule } from './shared/shared.module';
+import { OwlDateTimeModule, OwlNativeDateTimeModule } from 'ng-pick-datetime';
+import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
+import {DatePipe} from '@angular/common';
 
 @NgModule({
   declarations: [
@@ -45,6 +49,7 @@ import {DataService} from './models/data.service';
   ],
   imports: [
     BrowserModule,
+    BrowserAnimationsModule,
     RouterModule.forRoot(AppRoutes),
     SidebarModule,
     NavbarModule,
@@ -61,9 +66,12 @@ import {DataService} from './models/data.service';
             whitelistedDomains: ['localhost:3001'],
             throwNoTokenError: false
         }
-    })
+    }),
+    SharedModule,
+    OwlDateTimeModule, 
+    OwlNativeDateTimeModule,
   ],
-  providers: [GlobalService, UserService, DataService, AuthGuard],
+  providers: [GlobalService, UserService, DataService, AuthGuard,DatePipe],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

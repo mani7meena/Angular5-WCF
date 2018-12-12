@@ -28,6 +28,13 @@ export class UserService {
         this.loggedIn = this.isLoggedIn();
     }
 
+    private getHeaders():HttpHeaders {
+        return new HttpHeaders({
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer '+this.getToken(),
+        });
+    }
+
     public login(username, password) {
         //const headers = new HttpHeaders().set('Content-Type', 'application/json; charset=UTF-8');
         let headers = new HttpHeaders();
@@ -41,12 +48,37 @@ export class UserService {
                 //console.log(response);
                 if (response['status'] == 200 && response['message']=='Success') {
                     localStorage.setItem('access_token', response['data'][0]['bearerToken']);
-                    localStorage.setItem('company_id', response['data'][0]['company_ID']);
+                    localStorage.setItem('userID', response['data'][0]['userID']);
                     this.loggedIn = true;
                     response['success'] = true;
                 } else {
                     localStorage.removeItem('access_token');
-                    localStorage.removeItem('company_id');
+                    localStorage.removeItem('userID');
+                    this.loggedIn = false;
+                    response['success'] = false;
+                }
+                return response;
+            })
+            .catch(this.handleError);
+    }
+
+    public refreshToken() {
+        //const headers = new HttpHeaders().set('Content-Type', 'application/json; charset=UTF-8');
+        let headers = this.getHeaders();
+        return this._http
+            .post(
+                this._globalService.apiHost + '/jwtauth/TokenRefresh',{},{headers}
+            )
+            .map((response: AuthResponse) => {
+                console.log(response);
+                if (response['status'] == 200 && response['message']=='Success') {
+                    localStorage.setItem('access_token', response['data'][0]['bearerToken']);
+                    localStorage.setItem('userID', response['data'][0]['userID']);
+                    this.loggedIn = true;
+                    response['success'] = true;
+                } else {
+                    localStorage.removeItem('access_token');
+                    localStorage.removeItem('userID');
                     this.loggedIn = false;
                     response['success'] = false;
                 }
@@ -157,7 +189,7 @@ export class UserService {
 
     public logout(): void {
         localStorage.removeItem('access_token');
-        localStorage.removeItem('company_id');
+        localStorage.removeItem('userID');
         this.loggedIn = false;
     }
 
@@ -165,8 +197,8 @@ export class UserService {
         return localStorage.getItem('access_token');
     }
 
-    public getCompanyID(): any {
-        return localStorage.getItem('company_id');
+    public getUserID(): any {
+        return localStorage.getItem('userID');
     }
 
     private checkToken(): any {

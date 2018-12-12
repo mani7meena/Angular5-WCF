@@ -7,7 +7,7 @@
         <div class="content">
             <div class="container-fluid">
                 <div class="row">
-                    <div class="col-lg-3 col-sm-6">
+                    <div class="col-lg-3 col-sm-6" (click)="onClickType('Purchase Order',1)">
                         <div class="card">
                             <div class="content">
                                 <div class="row">
@@ -18,21 +18,21 @@
                                     </div>
                                     <div class="col-xs-7">
                                         <div class="numbers">
-                                            <p>Capacity</p>
-                                            105GB
+                                            <p>Purchase Order</p>
+                                            3 Nos
                                         </div>
                                     </div>
                                 </div>
-                                <div class="footer">
+                                <!-- <div class="footer">
                                     <hr />
                                     <div class="stats">
                                         <i class="ti-reload"></i> Updated now
                                     </div>
-                                </div>
+                                </div> -->
                             </div>
                         </div>
                     </div>
-                    <div class="col-lg-3 col-sm-6">
+                    <div class="col-lg-3 col-sm-6" (click)="onClickType('Work Order',2)">
                         <div class="card">
                             <div class="content">
                                 <div class="row">
@@ -43,21 +43,21 @@
                                     </div>
                                     <div class="col-xs-7">
                                         <div class="numbers">
-                                            <p>Revenue</p>
-                                            $1,345
+                                            <p>Work Order</p>
+                                            10 Nos
                                         </div>
                                     </div>
                                 </div>
-                                <div class="footer">
+                                <!-- <div class="footer">
                                     <hr />
                                     <div class="stats">
                                         <i class="ti-calendar"></i> Last day
                                     </div>
-                                </div>
+                                </div> -->
                             </div>
                         </div>
                     </div>
-                    <div class="col-lg-3 col-sm-6">
+                    <div class="col-lg-3 col-sm-6" (click)="onClickType('PO Authorization',3)">
                         <div class="card">
                             <div class="content">
                                 <div class="row">
@@ -68,21 +68,21 @@
                                     </div>
                                     <div class="col-xs-7">
                                         <div class="numbers">
-                                            <p>Errors</p>
-                                            23
+                                            <p>PO Authorization</p>
+                                            3 Nos
                                         </div>
                                     </div>
                                 </div>
-                                <div class="footer">
+                                <!-- <div class="footer">
                                     <hr />
                                     <div class="stats">
                                         <i class="ti-timer"></i> In the last hour
                                     </div>
-                                </div>
+                                </div> -->
                             </div>
                         </div>
                     </div>
-                    <div class="col-lg-3 col-sm-6">
+                    <!-- <div class="col-lg-3 col-sm-6">
                         <div class="card">
                             <div class="content">
                                 <div class="row">
@@ -106,30 +106,405 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    </div> -->
+                <button (click)="refreshToken()">Refresh Token</button>
                 </div>
 
                 <div class="row">
                     <div class="col-md-12">
                         <div class="card">
                             <div class="header">
-                                <h4 class="title">Transaction Details</h4>
+                                <h4 class="title">{{orderType}} <button class="pull-right" (click)="showAddForm(orderTypeID)">Add {{orderType}}</button></h4>
                                 <p class="category">List details of transactions</p>
                             </div>
                             <div class="content table-responsive table-full-width">
-                                <table class="table table-striped">
+                                <table class="table table-striped" *ngIf="!showAddEditForm">
                                     <thead>
                                         <tr>
                                             <th *ngFor="let cell of tableData1.headerRow">{{ cell }}</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr *ngFor="let row of tableData1.dataRows">
-                                            <td *ngFor="let cell of row">{{cell}}</td>
-                                        </tr>
+                                        <ng-container *ngIf="!loadingData;else loading">
+                                            <tr *ngFor="let row of tableData1.dataRows">
+                                                <td *ngFor="let cell of row">
+                                                    {{cell}}
+                                                </td>
+                                                <td>
+                                                    <button (click)="editDetail(row[0])">Edit</button>
+                                                </td>
+                                            </tr>
+                                        </ng-container>    
+                                        <ng-template #loading>
+                                            <tr>
+                                               <td colspan="6" class="text-center">Loading</td> 
+                                            </tr>
+                                        </ng-template>
                                     </tbody>
                                 </table>
-            
+
+<div class="container-fluid" *ngIf="showAddEditForm">
+    <form [formGroup]="_addForm" (ngSubmit)="onSubmitAddForm(_addForm.value)">
+        <div class="row">
+            <!-- <label class="col-sm-2 col-form-label">Purchase Order Add</label> -->
+            <div class="col-sm-12">
+                <div class="row">
+                    <div class="col-md-3">
+                        <label>Transaction No.</label>
+                        <div class="form-group" [ngClass]="{'has-error': !_isValid('transaction_no')}">
+                            <input class="form-control" placeholder="Transaction No" type="text" 
+                            [formControl]="_addForm.controls['transaction_no']" [ngClass]="{'form-control-danger': !_isValid('transaction_no')}"
+                            >
+                        </div>
+                        <!-- <span class="help-block help-block-error" *ngIf="!_formErrors.transaction_no.valid">{{_formErrors.transaction_no.message}}</span> -->
+                    </div>
+                    <div class="col-md-3">
+                        <label>Transaction Series</label>
+                        <div class="form-group bootstrap-select" [ngClass]="{'has-error': !_isValid('transaction_series')}">
+                            <select [formControl]="_addForm.controls['transaction_series']" [ngClass]="{'form-control-danger': !_isValid('transaction_series')}">
+                                <option *ngFor="let transactionSeries of allTransactionSeries" [value]="transactionSeries.transactionSeriesID">
+                                    {{ transactionSeries.seriesName }}
+                                </option>
+                            </select>
+                            <!-- <input class="form-control" placeholder="Transaction No" type="text"
+                            [formControl]="_addForm.controls['transaction_no']" [ngClass]="{'form-control-danger': !_isValid('transaction_no')}"
+                            > -->
+                        </div>
+                            <!-- <span class="help-block help-block-error" *ngIf="!_formErrors.transaction_no.valid">{{_formErrors.transaction_no.message}}</span> -->
+                        </div>
+                    <div class="col-md-3">
+                        <label>Transaction Date</label>
+                        <div class="form-group">
+                            <input class="form-control" placeholder="Transaction Date" 
+                            [owlDateTime]="dt1" [owlDateTimeTrigger]="dt1"
+                            [formControl]="_addForm.controls['transaction_date']" [ngClass]="{'form-control-danger': !_isValid('transaction_date')}"
+                            >
+                            <owl-date-time [pickerType]="'calendar'" #dt1></owl-date-time>
+                        </div>
+                    </div>
+
+                    <div class="col-md-3">
+                        <h3 class="text-center">Total Amount <br> <span>{{total_amount}}</span></h3>
+                    </div>
+
+                    <!-- <div class="col-md-2">
+                        <label>Transaction Due Date</label>
+                        <div class="form-group">
+                            <input class="form-control" placeholder="Transaction Due Date" type="text"
+                            [formControl]="_addForm.controls['transaction_due_date']" [ngClass]="{'form-control-danger': !_isValid('transaction_due_date')}"
+                            >
+                        </div>
+                    </div> -->
+                </div>
+                <div class="row">
+                    <!-- <div class="col-md-3">
+                        <label>Customer</label>
+                        <div class="form-group bootstrap-select">
+                            <select (ngModelChange)="onCustomerSelect($event)" [formControl]="_addForm.controls['customer']" [ngClass]="{'form-control-danger': !_isValid('customer')}">
+                                <option *ngFor="let customer of allCustomers" [value]="customer.customer_ID">
+                                    {{ customer.customerName }}
+                                </option>
+                            </select>
+                        </div>
+                    </div> -->
+                    <div class="col-md-3">
+                        <label>Supplier</label> 
+                        <div class="form-group bootstrap-select">
+                            <select (ngModelChange)="onSupplierSelect($event)" [formControl]="_addForm.controls['supplier']" [ngClass]="{'form-control-danger': !_isValid('supplier')}">
+                                <option *ngFor="let customer of allCustomers" [value]="customer.customer_ID">{{ customer.customerName }}</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- <div class="col-md-3">
+                        <label>PO NO</label>
+                        <div class="form-group bootstrap-select">
+                            <select [formControl]="_addForm.controls['po_no']" [ngClass]="{'form-control-danger': !_isValid('po_no')}">
+                                <option *ngFor="let po of allPOs" [value]="po.transactionID">{{ po.transactionID }}</option>
+                            </select>
+                        </div>
+                    </div> -->
+                    
+                    <!-- <div class="col-md-3">
+                        <label>Transaction Link Ref.</label>
+                        <div class="form-group" [ngClass]="{'has-error': !_isValid('transaction_link_ref')}">
+                            <input class="form-control" placeholder="Transaction Link Ref" type="text"
+                            [formControl]="_addForm.controls['transaction_link_ref']" [ngClass]="{'form-control-danger': !_isValid('transaction_link_ref')}"
+                            >
+                        </div>
+                    </div> -->
+
+                    <!-- <div class="col-md-3">
+                        <label>Transaction Remarks</label>
+                        <div class="form-group" [ngClass]="{'has-error': !_isValid('transaction_remarks')}">
+                            <input class="form-control" placeholder="Transaction Remarks" type="text"
+                            [formControl]="_addForm.controls['transaction_remarks']" [ngClass]="{'form-control-danger': !_isValid('transaction_remarks')}"
+                            >
+                        </div>
+                    </div> -->
+
+                    <!-- <div class="col-md-3">
+                        <label>Transaction Amount</label>
+                        <div class="form-group" [ngClass]="{'has-error': !_isValid('transaction_amount')}">
+                            <input class="form-control" placeholder="Transaction Amount" type="text"
+                            [formControl]="_addForm.controls['transaction_amount']" [ngClass]="{'form-control-danger': !_isValid('transaction_amount')}"
+                            >
+                        </div>
+                    </div> -->
+
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="row">
+                    <label class="col-sm-2 col-form-label"><strong>Item Details</strong></label>
+                </div>
+                <div class="row">
+                    <div class="col-md-2">
+                        <label>Stock Item</label>
+                        <div class="form-group bootstrap-select">
+                            <select (ngModelChange)="onItemSelect($event)" class="select" [formControl]="_addForm.controls['stock_item']" [ngClass]="{'form-control-danger': !_isValid('stock_item')}">
+                                <option *ngFor="let stockItem of allStockItems" [value]="stockItem.stockItemID">{{ stockItem.itemName }}</option>
+                            </select>
+                            <!-- <input class="form-control" placeholder="Stock Item" type="text"
+                            [formControl]="_addForm.controls['stock_item']" [ngClass]="{'form-control-danger': !_isValid('stock_item')}"
+                            > -->
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <label>Additional Desc.</label>
+                        <div class="form-group">
+                            <input class="form-control" placeholder="Additional Desc" type="text"
+                            [formControl]="_addForm.controls['additional_desc']" [ngClass]="{'form-control-danger': !_isValid('additional_desc')}"
+                            >
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <label>Location ID</label>
+                        <div class="form-group bootstrap-select">
+                            <select [formControl]="_addForm.controls['location_name']" [ngClass]="{'form-control-danger': !_isValid('location_name')}">
+                                <option *ngFor="let location of allLocations" [value]="location.locationID">{{ location.locationName }}</option>
+                            </select>
+                            <!-- <input class="form-control" placeholder="Location Name" type="text"
+                            [formControl]="_addForm.controls['location_name']" [ngClass]="{'form-control-danger': !_isValid('location_name')}"
+                            > -->
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <label>Qty</label>
+                        <div class="form-group">
+                            <input class="form-control" placeholder="Qty" type="text"
+                            [formControl]="_addForm.controls['qty']" [ngClass]="{'form-control-danger': !_isValid('qty')}"
+                            (keyup)="onEnterAmount()"
+                            >
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <label>Rate</label>
+                        <div class="form-group">
+                            <input class="form-control" placeholder="Rate" type="text"
+                            [formControl]="_addForm.controls['rate']" [ngClass]="{'form-control-danger': !_isValid('rate')}"
+                            (keyup)="onEnterAmount()"
+                            >
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <label>Amount</label>
+                        <div class="form-group">
+                            <input class="form-control" placeholder="Amount" type="text"
+                            [formControl]="_addForm.controls['id_amount']" [ngClass]="{'form-control-danger': !_isValid('id_amount')}"
+                            (keyup)="onEnterAmount()"
+                            >
+                        </div>
+
+                        <span class="btn btn-info" (click)="onAddItem()">Add</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="row">
+                    <label class="col-sm-2 col-form-label"><strong>Ledger Details</strong></label>
+                </div>
+                <div class="row">
+                    <div class="col-md-4">
+                        <label>Tax Ledger Name</label>
+                        <div class="form-group">
+                            <select (ngModelChange)="onTaxLedgerSelect($event)" [formControl]="_addForm.controls['tax_ledger_name']" [ngClass]="{'form-control-danger': !_isValid('tax_ledger_name')}">
+                                <option *ngFor="let ledger of allLedgers" [value]="ledger.ledger_ID">{{ ledger.ledgerName }}</option>
+                            </select>
+                            <!-- <input class="form-control" placeholder="Tax Ledger Name" type="text"
+                            [formControl]="_addForm.controls['tax_ledger_name']" [ngClass]="{'form-control-danger': !_isValid('tax_ledger_name')}"
+                            > -->
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <label>Tax Rate</label>
+                        <div class="form-group">
+                            <input class="form-control" placeholder="Tax Rate" type="text"
+                            [formControl]="_addForm.controls['tax_rate']" [ngClass]="{'form-control-danger': !_isValid('tax_rate')}"
+                            >
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <label>Amount</label>
+                        <div class="form-group">
+                            <input class="form-control" placeholder="Amount" type="text"
+                            [formControl]="_addForm.controls['ld_amount']" [ngClass]="{'form-control-danger': !_isValid('ld_amount')}"
+                            >
+                        </div>
+                        <span class="btn btn-info" (click)="onSetLedger()">Add</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="row">
+                    <label class="col-sm-2 col-form-label"><strong>PO Terms</strong></label>
+                </div>
+                <div class="row">
+                    <div class="col-md-2">
+                        <div class="form-group">
+                            <input class="form-control" placeholder="Due Date" type="text"
+                            [formControl]="_addForm.controls['due_date']" [ngClass]="{'form-control-danger': !_isValid('due_date')}"
+                            >
+                            
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="form-group">
+                            <input class="form-control" placeholder="Transporter" type="text"
+                            [formControl]="_addForm.controls['po_transporter']" [ngClass]="{'form-control-danger': !_isValid('po_transporter')}"
+                            >
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="form-group">
+                            <input class="form-control" placeholder="Supplier Ref" type="text"
+                            [formControl]="_addForm.controls['supplier_ref']" [ngClass]="{'form-control-danger': !_isValid('supplier_ref')}"
+                            >
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="form-group">
+                            <input class="form-control" placeholder="Delivery Terms" type="text"
+                            [formControl]="_addForm.controls['delivery_terms']" [ngClass]="{'form-control-danger': !_isValid('delivery_terms')}"
+                            >
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="form-group">
+                            <input class="form-control" placeholder="Payment Terms" type="text"
+                            [formControl]="_addForm.controls['payment_terms']" [ngClass]="{'form-control-danger': !_isValid('payment_terms')}"
+                            >
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="form-group">
+                            <input class="form-control" placeholder="Packing Terms" type="text"
+                            [formControl]="_addForm.controls['packing_terms']" [ngClass]="{'form-control-danger': !_isValid('packing_terms')}"
+                            >
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="form-group">
+                            <input class="form-control" placeholder="Freight Terms" type="text"
+                            [formControl]="_addForm.controls['freight_terms']" [ngClass]="{'form-control-danger': !_isValid('freight_terms')}"
+                            >
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="row">
+                    <label class="col-sm-2 col-form-label"><strong>GRN Terms</strong></label>
+                </div>
+                <div class="row">
+                    <div class="col-md-3">
+                        <label>PO NO</label>
+                        <div class="form-group bootstrap-select">
+                            <select [formControl]="_addForm.controls['po_no']" [ngClass]="{'form-control-danger': !_isValid('po_no')}">
+                                <option *ngFor="let po of allPOs" [value]="po.transactionID">{{ po.transactionID }}</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="form-group">
+                            <input class="form-control" placeholder="Inward No" type="text"
+                            [formControl]="_addForm.controls['inward_no']" [ngClass]="{'form-control-danger': !_isValid('inward_no')}"
+                            >
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="form-group">
+                            <input class="form-control" placeholder="Inward Date." type="text"
+                            [formControl]="_addForm.controls['inward_date']" [ngClass]="{'form-control-danger': !_isValid('inward_date')}"
+                            >
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="form-group">
+                            <input class="form-control" placeholder="Transporter" type="text"
+                            [formControl]="_addForm.controls['grn_transporter']" [ngClass]="{'form-control-danger': !_isValid('grn_transporter')}"
+                            >
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="form-group">
+                            <input class="form-control" placeholder="DC No." type="text"
+                            [formControl]="_addForm.controls['dc_no']" [ngClass]="{'form-control-danger': !_isValid('dc_no')}"
+                            >
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="form-group">
+                            <input class="form-control" placeholder="DC Date" type="text"
+                            [formControl]="_addForm.controls['dc_date']" [ngClass]="{'form-control-danger': !_isValid('dc_date')}"
+                            >
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="form-group">
+                            <input class="form-control" placeholder="Invoice No." type="text"
+                            [formControl]="_addForm.controls['invoice_no']" [ngClass]="{'form-control-danger': !_isValid('invoice_no')}"
+                            >
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="form-group">
+                            <input class="form-control" placeholder="Invoice Date" type="text"
+                            [formControl]="_addForm.controls['invoice_date']" [ngClass]="{'form-control-danger': !_isValid('invoice_date')}"
+                            >
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row text-center">
+            <span class="text-success" *ngIf="success_msg != ''">
+                    {{success_msg}}
+            </span><br>
+            <button class="btn btn-success btn-round" type="submit">Submit</button>
+            <button class="btn btn-danger btn-round" type="reset">Cancel</button>
+        </div>
+
+    </form>
+
+</div>
+                                
+                                <!-- <table class="table table-striped" *ngIf="showAddEditForm">
+                                    <pre>
+                                        {{transactionDetails | json}}
+                                    </pre>                                    
+                                </table> -->
                             </div>
                         </div>
                     </div>
