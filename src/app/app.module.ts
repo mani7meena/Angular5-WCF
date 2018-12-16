@@ -29,12 +29,14 @@ import {AuthGuard} from './models/auth.guard';
 import {UserService} from './models/user.service';
 import {GlobalService} from './models/global.service';
 import {DataService} from './models/data.service';
+
 import {PriceListService} from './models/price-list.service';
 import {SharedModule} from './shared/shared.module';
 import {OwlDateTimeModule, OwlNativeDateTimeModule} from 'ng-pick-datetime';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {DatePipe} from '@angular/common';
 import {MasterModule} from './master/master.module';
+
 
 @NgModule({
   declarations: [
