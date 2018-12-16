@@ -1,0 +1,203 @@
+
+<div class="row" *ngIf="mode=='home' || mode=='list' || mode=='edit'" >
+    <div class="col-lg-3 col-sm-6" (click)="onClickType('Supplier',1)">
+        <div class="card" [ngClass]="{'card-active': typeID==1}">
+            <div class="content">
+                <div class="row">
+                    <div class="col-xs-5">
+                        <div class="icon-big icon-warning text-center">
+                            <i class="ti-server"></i>
+                        </div>
+                    </div>
+                    <div class="col-xs-7">
+                        <div class="numbers">
+                            <p>Suppliers</p>
+                            3 Nos
+                        </div>
+                    </div>
+                </div>
+                <!-- <div class="footer">
+                    <hr />
+                    <div class="stats">
+                        <i class="ti-reload"></i> Updated now
+                    </div>
+                </div> -->
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-3 col-sm-6" (click)="onClickType('Customer',2)">
+        <div class="card" [ngClass]="{'card-active': typeID==2}">
+            <div class="content">
+                <div class="row">
+                    <div class="col-xs-5">
+                        <div class="icon-big icon-success text-center">
+                            <i class="ti-wallet"></i>
+                        </div>
+                    </div>
+                    <div class="col-xs-7">
+                        <div class="numbers">
+                            <p>Customers</p>
+                            10 Nos
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-12 text-right">
+        <button class="btn btn-info btn-fill btn-wd btn-custom" (click)="search()">Search</button>
+    </div>    
+</div>
+<hr>
+
+<div class="row" *ngIf="mode=='list'">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="header">
+                <h4 class="title">Price List
+                    <button class="btn btn-success btn-custom btn-fill pull-right" (click)="showForm()">Add New</button>
+                </h4>
+                <p class="category">Here is a list for price</p>
+            </div>
+            <div class="content table-responsive table-full-width">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th *ngFor="let cell of tableData1.headerRow">{{ cell }}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <ng-container *ngIf="!loadingData;else loading">
+                        <tr *ngFor="let row of tableData1.dataRows">
+                            <td *ngFor="let cell of row">{{cell}}</td>
+                            <td>
+                                <button class="btn btn-warning btn-sm btn-custom btn-fill" (click)="edit(row[0])">Edit</button>
+                            </td>
+                        </tr>
+                        </ng-container>
+                        <ng-template #loading>
+                            <tr>
+                               <td colspan="6" class="text-center">Loading</td> 
+                            </tr>
+                        </ng-template>
+                    </tbody>
+                </table>
+
+            </div>
+        </div>
+    </div>
+</div>
+    
+<div class="row" *ngIf="mode=='edit'">
+    <div class="card">
+        <div class="header">    
+            <h4 class="title" *ngIf="priceListID==0;">Add PriceList </h4>   
+            <h4 class="title" *ngIf="priceListID!=0;">Edit PriceList ({{priceListID}})</h4>
+        </div>  
+
+        <div class="content">
+        <form [formGroup]="_addForm" (ngSubmit)="add(_addForm.value)"> 
+            <div class="row">
+                <!-- <div class="col-md-4"><label>ID</label>
+                    <div class="form-group" [ngClass]="{'has-error': !_isValid('PriceListDate')}">
+                        <input class="form-control" placeholder="ID" type="text" 
+                        [formControl]="_addForm.controls['PriceListID']" [ngClass]="{'form-control-danger': !_isValid('PriceListID')}"
+                        >
+                    </div>
+                </div> -->
+                <div class="col-md-4"><label>Date</label>
+                    <div class="form-group" [ngClass]="{'has-error': !_isValid('PriceListDate')}">
+                        <input class="form-control" placeholder="Date" type="text" 
+                        [owlDateTime]="dt1" [owlDateTimeTrigger]="dt1"
+                        [formControl]="_addForm.controls['PriceListDate']" [ngClass]="{'form-control-danger': !_isValid('PriceListDate')}"
+                        ><owl-date-time [pickerType]="'calendar'" #dt1></owl-date-time>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <label *ngIf="typeID==1">Supplier</label>
+                    <label *ngIf="typeID==2">Customer</label>
+                    <div class="form-group bootstrap-select" [ngClass]="{'has-error': !_isValid('LedgerID')}">
+                        <select [formControl]="_addForm.controls['LedgerID']" [ngClass]="{'form-control-danger': !_isValid('LedgerID')}">
+                            <option *ngFor="let customer of allCustomers" [value]="customer.customer_ID">
+                                {{ customer.customerName }}
+                            </option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <h5>ITEMS</h5>
+
+            <div class="">
+                <table formArrayName="PriceListItems" *ngFor="let itemrow of _addForm.controls['PriceListItems'].controls; let i=index">
+                    <tr [formGroupName]="i">
+                        <td>
+                            <div class="form-group bootstrap-select">
+                                <label>Stock Item</label>
+                                <select class="select" [formControl]="_addForm.controls['PriceListItems'].controls[i].controls.stockItemID">
+                                    <option *ngFor="let stockItem of allStockItems" [value]="stockItem.stockItemID">{{ stockItem.itemName }}</option>
+                                </select>
+                            </div>
+                        </td>
+                        <!-- <td class="col-md-3">
+                            <div class="form-group">
+                                <label>Serial No</label>
+                                <input class="form-control" placeholder="Serial No" type="text" 
+                                [formControl]="_addForm.controls['PriceListItems'].controls[i].controls.itemSerialNo">
+                            </div>
+                        </td> -->
+                        <td class="col-md-2">
+                            <div class="form-group">
+                                <label>Item Rate</label>
+                                <input class="form-control" placeholder="Item Rate" type="text" 
+                                [formControl]="_addForm.controls['PriceListItems'].controls[i].controls.itemRate">
+                            </div>
+                        </td>
+                        <td class="col-md-2">
+                            <div class="form-group">
+                                <label>Stops Rate</label>
+                                <input class="form-control" placeholder="Stops Rate" type="text" 
+                                [formControl]="_addForm.controls['PriceListItems'].controls[i].controls.stopsRate">
+                            </div>
+                        </td>
+                         <td class="col-md-2">
+                            <div class="form-group">
+                                <label>Length Rate</label>
+                                <input class="form-control" placeholder="Length Rate" type="text" 
+                                [formControl]="_addForm.controls['PriceListItems'].controls[i].controls.lengthRate">
+                            </div>
+                        </td>
+                         <td class="col-md-2">
+                            <div class="form-group">
+                                <label>Discount Percentage</label>
+                                <input class="form-control" placeholder="Discount Percentage" type="text" 
+                                [formControl]="_addForm.controls['PriceListItems'].controls[i].controls.discountPercentage">
+                            </div>
+                        </td>
+                        <td>
+                        <button *ngIf="_addForm.controls['PriceListItems'].controls.length > 1" (click)="deleteRow(i)" class="btn btn-danger btn-sm btn-custom btn-fill"><i class="ti-trash"></i></button>
+                        </td>
+                  </tr>
+                </table>
+                <div class="text-right">
+                <button type="button" (click)="addNewRow()" class="btn btn-success btn-sm btn-fill btn-custom">
+                    <i class="ti-plus"></i>Add one more item
+                </button>
+                </div>
+            </div>
+
+            <div class="text-center">
+                <span class="text-success" *ngIf="success_msg != ''">
+                        {{success_msg}}
+                </span>
+                <span class="text-danger" *ngIf="_errorMessage != ''">
+                        {{_errorMessage}}
+                </span><hr />
+                <button class="btn btn-danger btn-custom btn-fill" type="reset">Cancel</button>
+                <button class="btn btn-success btn-custom btn-fill" type="submit">Submit</button>
+            </div>
+
+        </form>
+        </div>     
+    </div>
+</div>

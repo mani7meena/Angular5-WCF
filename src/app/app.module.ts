@@ -20,6 +20,7 @@ import { NotificationsComponent }   from './notifications/notifications.componen
 import { UpgradeComponent }   from './upgrade/upgrade.component';
 
 import {SimpleLayoutComponent} from "./layouts/simple-layout.component";
+import {FullLayoutComponent} from "./layouts/full-layout.component";
 import {P404Component} from './pages/404.component';
 import {JwtModule} from '@auth0/angular-jwt';
 import {HttpClientModule} from '@angular/common/http';
@@ -28,6 +29,12 @@ import {AuthGuard} from './models/auth.guard';
 import {UserService} from './models/user.service';
 import {GlobalService} from './models/global.service';
 import {DataService} from './models/data.service';
+import {PriceListService} from './models/price-list.service';
+import {SharedModule} from './shared/shared.module';
+import {OwlDateTimeModule, OwlNativeDateTimeModule} from 'ng-pick-datetime';
+import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
+import {DatePipe} from '@angular/common';
+import {MasterModule} from './master/master.module';
 
 @NgModule({
   declarations: [
@@ -41,10 +48,12 @@ import {DataService} from './models/data.service';
     NotificationsComponent,
     UpgradeComponent,
     P404Component,
-    SimpleLayoutComponent
+    SimpleLayoutComponent,
+    FullLayoutComponent
   ],
   imports: [
     BrowserModule,
+    BrowserAnimationsModule,
     RouterModule.forRoot(AppRoutes),
     SidebarModule,
     NavbarModule,
@@ -61,9 +70,13 @@ import {DataService} from './models/data.service';
             whitelistedDomains: ['localhost:3001'],
             throwNoTokenError: false
         }
-    })
+    }),
+    SharedModule,
+    OwlDateTimeModule, 
+    OwlNativeDateTimeModule,
+    MasterModule
   ],
-  providers: [GlobalService, UserService, DataService, AuthGuard],
+  providers: [GlobalService, UserService, DataService,PriceListService, AuthGuard,DatePipe],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

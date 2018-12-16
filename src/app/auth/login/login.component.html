@@ -40,7 +40,7 @@
                                     <a href="#" routerLink="/auth/register">Create an acccount?</a>
                                 </div>
                                 <div class="col-xs-6 text-xs-right">
-                                    <button type="submit" class="btn btn-primary px-2" [disabled]="!_loginForm.valid || _submitted == true">Login</button>
+                                    <button type="submit" class="btn btn-primary px-2 btn-fill btn-custom " [disabled]="!_loginForm.valid || _submitted == true">Login</button>
                                     <div class="spinner spinner-login" *ngIf="_submitted"></div>
                                 </div>
                                 <div *ngIf="_errorMessage" class="col-xs-12 error-block mt-h">

@@ -14,7 +14,9 @@ import {LoginComponent} from './auth/login/login.component';
 import {LogoutComponent} from './auth/logout/logout.component';
 import {SignupComponent} from './auth/signup/signup.component';
 import {SimpleLayoutComponent} from "./layouts/simple-layout.component";
+import {FullLayoutComponent} from "./layouts/full-layout.component";
 import {P404Component} from './pages/404.component';
+import { PriceListComponent } from './master/price-list/price-list.component';
 
 export const AppRoutes: Routes = [
     {
@@ -26,6 +28,20 @@ export const AppRoutes: Routes = [
         path: 'dashboard',
         component: DashboardComponent,
         canActivate: [AuthGuard],
+    },
+    {
+        path: 'master',
+        component: FullLayoutComponent,
+        canActivate: [AuthGuard],
+        children: [
+            {
+                path: 'price-list',
+                component: PriceListComponent,
+            },
+        ],
+        data: {
+            title: 'Masters - Price List'
+        },
     },
     {
         path: 'user',
